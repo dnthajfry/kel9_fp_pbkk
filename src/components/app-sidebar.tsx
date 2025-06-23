@@ -16,7 +16,12 @@ import { Separator } from "./ui/separator"
 import { ScrollArea } from "./ui/scroll-area"
 import { CreatePlaylistModal } from "./modals/create-playlist-modal"
 import { UploadSongModal } from "./modals/upload-song-modal"
+import { usePlaylists } from "@/context/playlist-context"
 import Image from "next/image"
+
+interface AppSidebarProps {
+  onUploadSuccess?: () => void
+}
 
 const sidebarPlaylists = [
     { name: "Running Playlist", href: "/playlist/running-playlist" },
@@ -32,10 +37,12 @@ const sidebarPlaylists = [
 ]
 
 
-export function AppSidebar() {
+export function AppSidebar({ onUploadSuccess }: AppSidebarProps) {
     const [showCreatePlaylist, setShowCreatePlaylist] = useState(false)
     const [showUploadSong, setShowUploadSong] = useState(false)
     const pathname = usePathname()
+    const { fetchPlaylists } = usePlaylists()
+    
     const router = useRouter()
 
     const navigationItems = [
@@ -133,6 +140,7 @@ export function AppSidebar() {
             <CreatePlaylistModal
                 open={showCreatePlaylist}
                 onOpenChange={setShowCreatePlaylist}
+                onCreateSuccess={fetchPlaylists}
             />
             <UploadSongModal
                 open={showUploadSong}

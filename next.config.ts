@@ -1,7 +1,9 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+  images: {
+    domains: ["ugdevcgrrmtcmvccbslv.supabase.co"], // ganti dengan domain Supabase kamu
+  },
+}
 
-export default nextConfig;
+export default nextConfig

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ClientLayout } from "@/components/layout/client-layout";
+import { SongsProvider } from "@/context/songs-context";
+import { PlaylistProvider } from "@/context/playlist-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,9 +30,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ClientLayout>
-          {children}
-        </ClientLayout>
+        <SongsProvider>
+          <PlaylistProvider>
+            <ClientLayout>{children}</ClientLayout>
+          </PlaylistProvider>
+        </SongsProvider>
       </body>
     </html>
   );

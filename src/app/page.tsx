@@ -1,88 +1,79 @@
 "use client"
 
-import PlaylistCard from "@/components/playlist-card"
+import { useEffect, useState } from "react"
+import { useSongs } from "@/context/songs-context"
 import SongCard from "@/components/song-card"
+import PlaylistCard from "@/components/playlist-card"
 
-
-const songsForYou = [
-  {
-    id: "1",
-    title: "Snooze",
-    artist: "SOS • SZA",
-    image: "/placeholder.svg?height=200&width=200",
-    color: "bg-blue-500",
-  },
-  {
-    id: "2",
-    title: "NEW MAGIC WAND",
-    artist: "IGOR • Tyler, The Creator",
-    image: "/placeholder.svg?height=200&width=200",
-    color: "bg-pink-400",
-  },
-  {
-    id: "3",
-    title: "Ghost Town",
-    artist: "ye • Kanye West",
-    image: "/placeholder.svg?height=200&width=200",
-    color: "bg-green-600",
-  },
-  {
-    id: "4",
-    title: "OLYMPIAN",
-    artist: "MUSIC • Playboi Carti",
-    image: "/placeholder.svg?height=200&width=200",
-    color: "bg-gray-200",
-  },
-]
-
-const playlists = [
-  {
-    id: "1",
-    title: "Sybau",
-    artist: "Shabilqis Naila",
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: "2",
-    title: "senja",
-    artist: "Dentha Jefry",
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: "3",
-    title: "ts pmo icl",
-    artist: "Lucky Virgiawan",
-    image: "/placeholder.svg?height=200&width=200",
-  },
-  {
-    id: "4",
-    title: "fun",
-    artist: "Jasmine Aziza",
-    image: "/placeholder.svg?height=200&width=200",
-  },
-]
+interface PublicPlaylist {
+  id: number
+  name: string
+  coverUrl?: string
+  user: {
+    name: string
+  }
+}
 
 export default function Home() {
+  const { songs, fetchSongs } = useSongs()
+  const [playlists, setPlaylists] = useState<PublicPlaylist[]>([])
+  const [loadingSongs, setLoadingSongs] = useState(true)
+  const [loadingPlaylists, setLoadingPlaylists] = useState(true)
+
+  useEffect(() => {
+    fetchSongs().finally(() => setLoadingSongs(false))
+
+    fetch("/api/public-playlists")
+      .then((res) => res.json())
+      .then((data) => setPlaylists(data))
+      .catch(console.error)
+      .finally(() => setLoadingPlaylists(false))
+  }, [fetchSongs])
+
   return (
-    <div className="space-y-8">
-      {/* Songs For You Section */}
-      <section>
-        <h2 className="text-2xl font-bold mb-6">Songs For You</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {songsForYou.map((song) => (
-            <SongCard key={song.id} song={song} />
-          ))}
-        </div>
+    <div className="space-y-12">
+      {/* Songs Section */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-bold">Songs For You</h2>
+        {loadingSongs ? (
+          <p className="text-gray-400">Loading songs...</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {songs.map((song) => (
+              <SongCard
+                key={song.id}
+                song={{
+                  id: String(song.id),
+                  title: song.title,
+                  artist: song.artist,
+                  image: song.coverUrl || "/placeholder.svg",
+                  audioUrl: song.audioUrl,
+                }}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* Playlist Section */}
-      <section>
-        <h2 className="text-2xl font-bold mb-6">Playlist</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {playlists.map((playlist) => (
-            <PlaylistCard key={playlist.id} playlist={playlist} />
-          ))}
-        </div>
+      {/* Playlists Section */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-bold">Playlists For You</h2>
+        {loadingPlaylists ? (
+          <p className="text-gray-400">Loading playlists...</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {playlists.map((playlist) => (
+              <PlaylistCard
+                key={playlist.id}
+                playlist={{
+                  id: playlist.id,
+                  name: playlist.name,
+                  coverUrl: playlist.coverUrl || "/placeholder.svg",
+                }}
+              />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   )

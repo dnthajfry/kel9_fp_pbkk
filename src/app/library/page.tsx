@@ -1,30 +1,39 @@
-"use client"
+"use client";
 
-import PlaylistCard from "@/components/playlist-card"
-
-const libraryPlaylists = [
-  { id: "1", title: "Sybau", artist: "Shabilqis Naila", image: "/placeholder.svg?height=200&width=200" },
-  { id: "2", title: "senja", artist: "Shabilqis Naila", image: "/placeholder.svg?height=200&width=200" },
-  { id: "3", title: "ts pmo icl", artist: "Shabilqis Naila", image: "/placeholder.svg?height=200&width=200" },
-  { id: "4", title: "fun", artist: "Shabilqis Naila", image: "/placeholder.svg?height=200&width=200" },
-  { id: "5", title: "Playlist name", artist: "Shabilqis Naila", image: "/placeholder.svg?height=200&width=200" },
-  { id: "6", title: "Playlist name", artist: "Shabilqis Naila", image: "/placeholder.svg?height=200&width=200" },
-  { id: "7", title: "Playlist name", artist: "Shabilqis Naila", image: "/placeholder.svg?height=200&width=200" },
-  { id: "8", title: "Playlist name", artist: "Shabilqis Naila", image: "/placeholder.svg?height=200&width=200" },
-  { id: "9", title: "Playlist name", artist: "Shabilqis Naila", image: "/placeholder.svg?height=200&width=200" },
-  { id: "10", title: "Playlist name", artist: "Shabilqis Naila", image: "/placeholder.svg?height=200&width=200" },
-  { id: "11", title: "Playlist name", artist: "Shabilqis Naila", image: "/placeholder.svg?height=200&width=200" },
-  { id: "12", title: "Playlist name", artist: "Shabilqis Naila", image: "/placeholder.svg?height=200&width=200" },
-]
+import { useEffect, useState } from "react";
+import PlaylistCard from "@/components/playlist-card";
+import { usePlaylists } from "@/context/playlist-context";
 
 export default function LibraryPage() {
+  const { playlists, fetchPlaylists } = usePlaylists();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPlaylists().finally(() => setLoading(false));
+  }, [fetchPlaylists]);
+
   return (
-    <div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {libraryPlaylists.map((playlist) => (
-          <PlaylistCard key={playlist.id} playlist={playlist} />
-        ))}
-      </div>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Your Library</h2>
+      {loading ? (
+        <p className="text-gray-400">Loading your playlists...</p>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {playlists.map((playlist) => (
+            <PlaylistCard
+              key={playlist.id}
+              playlist={{
+                id: playlist.id,
+                name: playlist.name,
+                coverUrl: playlist.coverUrl,
+              }}
+            />
+          ))}
+        </div>
+      )}
+      {!loading && playlists.length === 0 && (
+        <p className="text-gray-500">You haven't created any playlists yet.</p>
+      )}
     </div>
-  )
+  );
 }
